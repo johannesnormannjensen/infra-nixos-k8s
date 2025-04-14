@@ -64,18 +64,20 @@ in {
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  environment.systemPackages = with pkgs; [
-    git
-    curl
-    wget
-    htop
-    tmux
-    vim
-    zsh
-    docker
-    kubectl
-    ${helm} # Brug statisk Helm uden X11
-  ];
+  environment.systemPackages =
+    (with pkgs; [
+      git
+      curl
+      wget
+      htop
+      tmux
+      vim
+      zsh
+      docker
+      kubectl
+    ]) ++ [
+      helm  # ← her refererer vi til variablen 'helm' defineret ovenfor
+    ];
 
   environment.variables.KUBECONFIG = "/etc/rancher/k3s/k3s.yaml";
 
