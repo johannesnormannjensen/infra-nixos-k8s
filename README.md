@@ -1,37 +1,60 @@
-# NixOS Kubernetes Cluster (K3s) – Flake-Based Setup
+# 🚀 NixOS Kubernetes Cluster (K3s) – Flake-Based Setup
 
-This repo provides a reproducible Kubernetes cluster setup using NixOS flakes and K3s.
+This repo provides a reproducible and modular Kubernetes cluster setup using [NixOS flakes](https://nixos.wiki/wiki/Flakes) and [K3s](https://k3s.io/), along with GitHub Actions Runner Controller (ARC).
+
+---
 
 ## 🔧 Requirements
 
 - NixOS installed on all nodes
-- Flakes and `nix-command` enabled
+- `flakes` and `nix-command` enabled (included via `common.nix`)
 - Each node should have its own `/etc/nixos/hardware-configuration.nix`
+- Internet access to pull Helm charts and Docker images
 
-## 📦 Included Roles
+---
 
-- `master.nix`: Configures the Kubernetes control plane (K3s server)
-- `worker.nix`: Reusable configuration for all worker nodes using env variables
-- `common.nix`: Shared system configuration (user, firewall, Docker, etc.)
+## 📦 Structure & Roles
 
-## 🖥️ Setup Instructions
+| File/Folder              | Purpose |
+|--------------------------|---------|
+| `flake.nix`              | Top-level flake entrypoint |
+| `hosts/master.nix`       | Master node setup (K3s server, ARC tools) |
+| `hosts/worker.nix`       | Worker node template (dynamic via env vars) |
+| `hosts/common.nix`       | Shared config (users, SSH, Docker, zsh, etc.) |
+| `modules/arc-tools.nix`  | Declarative Helm install tools for ARC |
+| `arc/`                   | ARC controller values and runner set YAMLs |
 
-### 1. Master Node
+---
+
+## 🖥️ Master Node Setup
+
+1. Ensure `hardware-configuration.nix` is present:
 
 ```bash
-sudo nixos-rebuild switch --flake .#master --impure
+ls /etc/nixos/hardware-configuration.nix
 ```
 
-This assumes /etc/nixos/hardware-configuration.nix exists on the master node.
+2. Deploy the master node:
 
-To get the K3s token (needed for workers):
+```bash
+sudo nixos-rebuild switch --flake .#master
+```
+
+3. Check the status of K3s:
+
+```bash
+kubectl get nodes
+```
+
+4. Retrieve token to join worker nodes:
 
 ```bash
 sudo cat /var/lib/rancher/k3s/server/node-token
 ```
 
-### 2. Worker Nodes
-Export required environment variables and run:
+## 👷 Worker Nodes Setup
+
+You can reuse the same flake config for all workers. Just set environment variables per node:
 
 ```bash
 export HOSTNAME=worker-general-1
@@ -40,29 +63,22 @@ export K3S_TOKEN=<your-token>
 export K3S_NODE_LABELS="purpose=general"
 export K3S_NODE_TAINTS=""
 
-sudo nixos-rebuild switch --flake .#worker --impure
+sudo nixos-rebuild switch --flake .#worker
 ```
-You can reuse the same worker.nix for as many nodes as you'd like.
 
-🧪 Verify the cluster
-On the master node:
-```bash
-export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
-kubectl get nodes
-```
-You should see all joined nodes listed.
+This allows dynamic, reproducible deployments across many machines of the same type.
 
-⚙️ Automatic kubeconfig for kubectl
-To avoid having to set the KUBECONFIG variable manually, the following is included in common.nix:
-```nix
- environment.variables.KUBECONFIG = "/etc/rancher/k3s/k3s.yaml";
-```
-This makes the kubeconfig available automatically for the kubectl command after login.
-It is especially useful on the master node.
+## 🛠️ ARC CLI Tools
 
-🧠 Notes
- - The --impure flag is required since we refer to files outside the flake (e.g., hardware config).
+ARC-related CLI tools are declared in modules/arc-tools.nix and included only on the master node. Once deployed, the following tools are available system-wide:
 
- - You can override more via builtins.getEnv (e.g. labels, taints, etc.)
 
- - For clusters with varied hardware, consider dedicated workerN.nix configs.
+| Command | Description |
+|---------------------------|-----------------------------------|
+| `arc-deploy`              | Installs ARC controller via Helm  |
+| `arc-uninstall`           | Uninstalls ARC controller         |
+| `arc-runners-deploy`      | Installs all runner sets (from arc/runner-set/*.yaml) |
+| `arc-runners-upgrade`     | Re-applies runner set configs     |
+| `arc-runners-uninstall`   | Removes all runner sets           |
+| `arc-status`              | Displays runner pods in the arc-systems namespace       |
+| `arc-status-watch`        | Watches the status of runner pods in the arc-systems namespace |
