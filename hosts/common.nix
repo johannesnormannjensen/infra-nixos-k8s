@@ -38,7 +38,8 @@
     bashInteractive
     docker
     kubectl
-    kubernetes-helm
+    kubernetes-helm   # ← Helm (be sure not to use "helm" as it is a different outdated package)
+    gh                # ← GitHub CLI
   ];
 
   environment.variables.KUBECONFIG = "/etc/rancher/k3s/k3s.yaml";

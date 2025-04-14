@@ -16,6 +16,7 @@
     extraFlags = "--write-kubeconfig-mode=644";
   };
 
+  environment.etc."secrets".source = "/etc/secrets";
 
   system.stateVersion = "24.11";
 }
