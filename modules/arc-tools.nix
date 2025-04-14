@@ -12,6 +12,7 @@ in {
         oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller \
         --namespace arc-systems \
         --create-namespace \
+        --reset-values \
         --values ${toString controllerValues} --debug
     '')
 
@@ -29,6 +30,7 @@ in {
           oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set \
           --namespace arc-systems-runners \
           --create-namespace \
+          --reset-values \
           --values "$file"
       done
     '')
