@@ -1,0 +1,35 @@
+githubConfigUrl: "https://github.com/yourrepo"
+githubConfigSecret: pre-defined-secret
+
+minRunners: 4
+runnerGroup: "default"
+
+template:
+  spec:
+    imagePullSecrets:
+    - name: runnersecret
+
+    containers:
+    - name: runner
+      image: ghcr.io/actions/actions-runner:latest
+      imagePullPolicy: Always
+      command: ["/home/runner/run.sh"]
+      resources:
+        requests:
+          cpu: 2
+          memory: 6Gi
+        limits:
+          cpu: 2
+          memory: 6Gi
+      volumeMounts:
+        - name: work
+          mountPath: /home/runner/_work
+        - name: tool-cache
+          mountPath: /opt/hostedtoolcache
+
+    volumes:
+      - name: work
+        emptyDir: {}
+      - name: tool-cache
+        persistentVolumeClaim:
+          claimName: cache-pvc
