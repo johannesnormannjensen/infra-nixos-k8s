@@ -39,7 +39,6 @@
       bashInteractive
       docker
       kubectl
-      helm
     ]);
 
   environment.variables.KUBECONFIG = "/etc/rancher/k3s/k3s.yaml";
