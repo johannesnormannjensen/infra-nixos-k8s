@@ -38,7 +38,7 @@
     bashInteractive
     docker
     kubectl
-    pkgs.helm
+    kubernetes-helm
   ];
 
   environment.variables.KUBECONFIG = "/etc/rancher/k3s/k3s.yaml";
