@@ -1,23 +1,6 @@
 { config, pkgs, ... }:
 
-let
-  helm = pkgs.stdenv.mkDerivation {
-    pname = "helm";
-    version = "3.14.0";
-
-    src = pkgs.fetchurl {
-      url = "https://get.helm.sh/helm-v3.14.0-linux-amd64.tar.gz";
-      sha256 = "sha256-9D4cM4feJFR1BqsF0k5TCcDOCyKMI72Kpk6exLggZlE=";
-    };
-
-    unpackPhase = "tar -xzf $src";
-    installPhase = ''
-      mkdir -p $out/bin
-      cp linux-amd64/helm $out/bin/helm
-      chmod +x $out/bin/helm
-    '';
-  };
-in {
+{
   networking.useDHCP = true;
   networking.firewall.enable = false;
 
@@ -56,9 +39,8 @@ in {
       bashInteractive
       docker
       kubectl
-    ]) ++ [
       helm
-    ];
+    ]);
 
   environment.variables.KUBECONFIG = "/etc/rancher/k3s/k3s.yaml";
 

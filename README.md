@@ -20,7 +20,7 @@ This repo provides a reproducible and modular Kubernetes cluster setup using [Ni
 | `flake.nix`              | Top-level flake entrypoint |
 | `hosts/master.nix`       | Master node setup (K3s server, ARC tools) |
 | `hosts/worker.nix`       | Worker node template (dynamic via env vars) |
-| `hosts/common.nix`       | Shared config (users, SSH, Docker, zsh, etc.) |
+| `hosts/common.nix`       | Shared config (users, SSH, Docker, etc.) |
 | `modules/arc-tools.nix`  | Declarative Helm install tools for ARC |
 | `arc/`                   | ARC controller values and runner set YAMLs |
 
