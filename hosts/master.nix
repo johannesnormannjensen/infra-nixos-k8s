@@ -6,7 +6,10 @@
     enable = true;
     role = "server";
     clusterInit = true;
-    extraServerArgs = "--write-kubeconfig-mode=644";
+
+    serverConfig = {
+      write-kubeconfig-mode = "644";
+    };
   };
 
   environment.systemPackages = with pkgs; [
@@ -14,4 +17,6 @@
     kubectl
     helm
   ];
+
+  system.stateVersion = "24.11";
 }
