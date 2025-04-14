@@ -28,19 +28,18 @@
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  environment.systemPackages =
-    (with pkgs; [
-      git
-      curl
-      wget
-      htop
-      tmux
-      vim
-      bashInteractive
-      docker
-      kubectl
-      helm
-    ]);
+  environment.systemPackages = with pkgs; [
+    git
+    curl
+    wget
+    htop
+    tmux
+    vim
+    bashInteractive
+    docker
+    kubectl
+    pkgs.helm
+  ];
 
   environment.variables.KUBECONFIG = "/etc/rancher/k3s/k3s.yaml";
 
