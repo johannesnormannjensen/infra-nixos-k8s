@@ -8,6 +8,10 @@
   # Locale og tid
   time.timeZone = "Europe/Copenhagen";
   i18n.defaultLocale = "en_DK.UTF-8";
+  i18n.supportedLocales = [
+    "da_DK.UTF-8/UTF-8"
+    "en_DK.UTF-8/UTF-8"
+  ];
 
   # Bruger
   users.users.johannes = {

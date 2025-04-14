@@ -1,17 +1,18 @@
 {
-  description = "NixOS Kubernetes Cluster Flake";
+  description = "NixOS Kubernetes Cluster";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
   };
 
   outputs = { self, nixpkgs, ... }: {
-    nixosConfigurations.master = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [
-        ./hosts/common.nix
-        ./hosts/master.nix
-      ];
+    nixosConfigurations = {
+      master = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          ./hosts/master.nix
+        ];
+      };
     };
   };
 }
