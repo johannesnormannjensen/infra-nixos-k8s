@@ -8,7 +8,7 @@ let
 
     src = pkgs.fetchurl {
       url = "https://get.helm.sh/helm-v3.14.0-linux-amd64.tar.gz";
-      sha256 = "sha256-jOiVlfVnZTWGmiFmqv4dnKKCE1S1DiDbFtXBNSW3A58=";
+      sha256 = "sha256-9D4cM4feJFR1BqsF0k5TCcDOCyKMI72Kpk6exLggZlE=";
     };
 
     unpackPhase = "tar -xzf $src";
