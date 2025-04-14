@@ -1,11 +1,9 @@
 { config, pkgs, ... }:
 
 {
-  # Netværk
   networking.useDHCP = true;
   networking.firewall.enable = false;
 
-  # Locale og tid
   time.timeZone = "Europe/Copenhagen";
   i18n.defaultLocale = "en_DK.UTF-8";
   i18n.supportedLocales = [
@@ -13,7 +11,6 @@
     "en_DK.UTF-8/UTF-8"
   ];
 
-  # Bruger
   users.users.johannes = {
     isNormalUser = true;
     extraGroups = [ "wheel" "networkmanager" "docker" ];
@@ -23,30 +20,14 @@
     ];
   };
 
-  # Sudo uden password
   security.sudo.wheelNeedsPassword = false;
-
-  # SSH
   services.openssh.enable = true;
-
-  # ZSH
   programs.zsh.enable = true;
-
-  # Docker
   virtualisation.docker.enable = true;
 
-  # Flakes og nix command
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  # Pakker
   environment.systemPackages = with pkgs; [
-    git
-    curl
-    wget
-    htop
-    tmux
-    vim
-    zsh
-    docker
+    git curl wget htop tmux vim zsh docker
   ];
 }

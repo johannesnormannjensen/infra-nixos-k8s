@@ -15,9 +15,7 @@
   };
 
   environment.systemPackages = with pkgs; [
-    k3s
-    kubectl
-    helm
+    k3s kubectl helm
   ];
 
   boot.loader.systemd-boot.enable = true;
