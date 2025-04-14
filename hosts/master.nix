@@ -5,6 +5,7 @@
     /etc/nixos/hardware-configuration.nix
     ./common.nix
     ../modules/arc-tools.nix
+    ../modules/arc-secrets.nix
   ];
 
   networking.hostName = "k8s-master";

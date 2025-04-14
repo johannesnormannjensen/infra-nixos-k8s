@@ -1,60 +1,40 @@
-# 🚀 NixOS Kubernetes Cluster (K3s) – Flake-Based Setup
+# NixOS Kubernetes Cluster (K3s) – Flake-Based Setup
 
-This repo provides a reproducible and modular Kubernetes cluster setup using [NixOS flakes](https://nixos.wiki/wiki/Flakes) and [K3s](https://k3s.io/), along with GitHub Actions Runner Controller (ARC).
-
----
+This repo provides a reproducible Kubernetes cluster setup using NixOS flakes and K3s.
 
 ## 🔧 Requirements
 
-- NixOS installed on all nodes
-- `flakes` and `nix-command` enabled (included via `common.nix`)
+- NixOS installed on all nodes  
+- Flakes and `nix-command` enabled  
 - Each node should have its own `/etc/nixos/hardware-configuration.nix`
-- Internet access to pull Helm charts and Docker images
 
----
+## 📦 Included Roles
 
-## 📦 Structure & Roles
+- `master.nix`: Configures the Kubernetes control plane (K3s server)  
+- `worker.nix`: Reusable configuration for all worker nodes using env variables  
+- `common.nix`: Shared system configuration (user, firewall, Docker, etc.)  
+- `arc-tools.nix`: Installs runner controller and runner sets  
+- `arc-secrets.nix`: Provides CLI tools to manage ARC secrets  
 
-| File/Folder              | Purpose |
-|--------------------------|---------|
-| `flake.nix`              | Top-level flake entrypoint |
-| `hosts/master.nix`       | Master node setup (K3s server, ARC tools) |
-| `hosts/worker.nix`       | Worker node template (dynamic via env vars) |
-| `hosts/common.nix`       | Shared config (users, SSH, Docker, etc.) |
-| `modules/arc-tools.nix`  | Declarative Helm install tools for ARC |
-| `arc/`                   | ARC controller values and runner set YAMLs |
+## 🖥️ Setup Instructions
 
----
-
-## 🖥️ Master Node Setup
-
-1. Ensure `hardware-configuration.nix` is present:
+### 1. Master Node
 
 ```bash
-ls /etc/nixos/hardware-configuration.nix
+sudo nixos-rebuild switch --flake .#master --impure
 ```
 
-2. Deploy the master node:
+This assumes `/etc/nixos/hardware-configuration.nix` exists on the master node.
 
-```bash
-sudo nixos-rebuild switch --flake .#master
-```
-
-3. Check the status of K3s:
-
-```bash
-kubectl get nodes
-```
-
-4. Retrieve token to join worker nodes:
+To get the K3s token (needed for workers):
 
 ```bash
 sudo cat /var/lib/rancher/k3s/server/node-token
 ```
 
-## 👷 Worker Nodes Setup
+### 2. Worker Nodes
 
-You can reuse the same flake config for all workers. Just set environment variables per node:
+Create a hardware config (e.g. `/etc/nixos/hardware-configuration.nix`) on the worker node. Then run:
 
 ```bash
 export HOSTNAME=worker-general-1
@@ -63,44 +43,97 @@ export K3S_TOKEN=<your-token>
 export K3S_NODE_LABELS="purpose=general"
 export K3S_NODE_TAINTS=""
 
-sudo nixos-rebuild switch --flake .#worker
+sudo nixos-rebuild switch --flake .#worker --impure
 ```
 
-This allows dynamic, reproducible deployments across many machines of the same type.
+You can reuse the same `worker.nix` for as many nodes as you'd like.
 
-## 🛠️ ARC CLI Tools
+## 🧪 Verifying cluster
 
-ARC-related CLI tools are declared in modules/arc-tools.nix and included only on the master node. Once deployed, the following tools are available system-wide:
+On the master node:
 
+```bash
+export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+kubectl get nodes
+```
 
-| Command | Description |
-|---------------------------|-----------------------------------|
-| `arc-deploy`              | Installs ARC controller via Helm  |
-| `arc-uninstall`           | Uninstalls ARC controller         |
-| `arc-runners-deploy`      | Installs all runner sets (from arc/runner-set/*.yaml) |
-| `arc-runners-upgrade`     | Re-applies runner set configs     |
-| `arc-runners-uninstall`   | Removes all runner sets           |
-| `arc-status`              | Displays runner pods in the arc-systems namespace       |
-| `arc-status-watch`        | Watches the status of runner pods in the arc-systems namespace |
+You should see all joined nodes listed.
 
+## ⚙️ Automatic kubeconfig for kubectl
 
-## ⚙️ Auto kubeconfig (kubectl ready out-of-the-box)
-
-To avoid having to set the KUBECONFIG environment variable manually:
+To avoid having to set the `KUBECONFIG` variable manually, the following is included in `common.nix`:
 
 ```nix
 environment.variables.KUBECONFIG = "/etc/rancher/k3s/k3s.yaml";
 ```
-This is part of common.nix and ensures kubectl just works after login.
 
-## 📝 Notes
-- The --impure flag is no longer needed after correcting relative paths to ARC files.
-- You can override per-node behavior (e.g., taints, labels, etc.) using builtins.getEnv in the worker flake config.
-- Worker nodes can be cloned and added rapidly if they share hardware and config.
-- Master node includes ARC only to reduce complexity and avoid unnecessary Helm dependencies on workers.
+This makes the kubeconfig available automatically for the kubectl command after login.  
+It is especially useful on the master node.
 
-## 📍 Future Ideas
-- Use SOPS or Sealed Secrets for secrets management
-- Add metrics (Prometheus/Grafana stack)
-- Enable PXE or USB netboot with automatic flake-based provisioning
-- Integrate backup/restore of cluster state
+## ⚒️ ARC Controller + Runner Installation
+
+| Command               | Description                                           |
+|-----------------------|-------------------------------------------------------|
+| `arc-deploy`          | Installs or upgrades the ARC controller               |
+| `arc-uninstall`       | Uninstalls the ARC controller                         |
+| `arc-runners-deploy`  | Installs all runner sets in `arc/runner-set/`         |
+| `arc-runners-upgrade` | Upgrades all runner sets                              |
+| `arc-runners-uninstall` | Uninstalls all runner sets                         |
+| `arc-status`          | Shows pod status for namespace `arc-system`           |
+
+## 🔐 Authenticating GitHub CLI (gh)
+
+You must authenticate the GitHub CLI to be able to interact with the GitHub Container Registry (`ghcr.io`) and generate tokens for ARC secrets.
+
+You can authenticate in two ways:
+
+### Option 1: Interactive Login
+
+```bash
+gh auth login
+```
+
+Choose:
+- GitHub.com
+- HTTPS
+- Login with a web browser (follow the instructions)
+
+### Option 2: Login with token
+
+Generate a personal access token (PAT) with `read:org`, `repo`, `write:packages`, and `admin:org` scopes.
+
+```bash
+gh auth login --with-token < ~/.ghtoken
+```
+
+## 🔐 Managing GitHub App Secrets
+
+1. Store your private key on the master node (do not version control):
+
+```
+/etc/secrets/gh-app-private-key.pem
+```
+
+2. Export these environment variables before running the secrets command:
+
+```bash
+export GITHUB_APP_ID=your-app-id
+export GITHUB_APP_INSTALLATION_ID=your-installation-id
+export GITHUB_DOCKER_USERNAME=username-gh-login
+```
+
+3. Create the secrets:
+
+```bash
+arc-secrets-create
+```
+
+This sets up:
+- `runnersecret`: a Docker registry secret for `ghcr.io`
+- `pre-defined-secret`: a secret containing your GitHub App credentials
+
+## 🧠 Notes
+
+- The `--impure` flag is required if hardware-configuration.nix is imported from `/etc`.
+- You can override more via `builtins.getEnv` (e.g. labels, taints).
+- For clusters with varied hardware, consider dedicated `workerN.nix` configs.
