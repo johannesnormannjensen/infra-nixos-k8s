@@ -37,6 +37,7 @@
     btop
     tmux
     vim
+    openssl
     bashInteractive
     docker
     kubectl
