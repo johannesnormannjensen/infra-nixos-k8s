@@ -14,11 +14,29 @@
   users.users.johannes = {
     isNormalUser = true;
     extraGroups = [ "wheel" "networkmanager" "docker" ];
-    shell = pkgs.zsh;
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOQdssF2Mz9XboO8WdJOt5eBIqJDngCFeM9UoxhxOzoX nixos-k8s-cluster"
     ];
+    shell = pkgs.zsh;
+    # Automatically create a basic .zshrc
+    home = "/home/johannes";
   };
+
+  environment.etc."zshrc-johannes".text = ''
+    # Custom .zshrc for johannes
+    export PATH=$HOME/bin:/run/wrappers/bin:$PATH
+    setopt autocd
+    setopt correct
+    setopt interactivecomments
+    HISTFILE=~/.zsh_history
+    HISTSIZE=10000
+    SAVEHIST=10000
+  '';
+
+  system.activationScripts.zshrc-johannes.text = ''
+    ln -sf /etc/zshrc-johannes /home/johannes/.zshrc
+    chown johannes:users /home/johannes/.zshrc
+  '';
 
   security.sudo.wheelNeedsPassword = false;
 
