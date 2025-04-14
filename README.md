@@ -82,3 +82,25 @@ ARC-related CLI tools are declared in modules/arc-tools.nix and included only on
 | `arc-runners-uninstall`   | Removes all runner sets           |
 | `arc-status`              | Displays runner pods in the arc-systems namespace       |
 | `arc-status-watch`        | Watches the status of runner pods in the arc-systems namespace |
+
+
+## ⚙️ Auto kubeconfig (kubectl ready out-of-the-box)
+
+To avoid having to set the KUBECONFIG environment variable manually:
+
+```nix
+environment.variables.KUBECONFIG = "/etc/rancher/k3s/k3s.yaml";
+```
+This is part of common.nix and ensures kubectl just works after login.
+
+## 📝 Notes
+- The --impure flag is no longer needed after correcting relative paths to ARC files.
+- You can override per-node behavior (e.g., taints, labels, etc.) using builtins.getEnv in the worker flake config.
+- Worker nodes can be cloned and added rapidly if they share hardware and config.
+- Master node includes ARC only to reduce complexity and avoid unnecessary Helm dependencies on workers.
+
+## 📍 Future Ideas
+- Use SOPS or Sealed Secrets for secrets management
+- Add metrics (Prometheus/Grafana stack)
+- Enable PXE or USB netboot with automatic flake-based provisioning
+- Integrate backup/restore of cluster state
