@@ -8,11 +8,12 @@ in {
 
     # ARC controller install
     (pkgs.writeShellScriptBin "arc-deploy" ''
+      unset DISPLAY
       helm upgrade --install arc \
         oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller \
         --namespace arc-systems \
         --create-namespace \
-        --values ${toString controllerValues}
+        --values ${toString controllerValues} --debug
     '')
 
     # ARC controller uninstall
