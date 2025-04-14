@@ -32,7 +32,9 @@
     git
     curl
     wget
+    jq
     htop
+    btop
     tmux
     vim
     bashInteractive
