@@ -29,10 +29,20 @@
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
+  # Environment packages
   environment.systemPackages = with pkgs; [
-    git curl wget htop tmux vim zsh docker
+    git
+    curl
+    wget
+    htop
+    tmux
+    vim
+    zsh
+    docker
+    helm
+    kubectl
   ];
 
-  # Automatically use k3s kubeconfig when running kubectl
+  # Set default kubeconfig
   environment.variables.KUBECONFIG = "/etc/rancher/k3s/k3s.yaml";
 }
