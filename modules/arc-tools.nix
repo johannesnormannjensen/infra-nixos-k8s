@@ -1,8 +1,8 @@
 { pkgs, ... }:
 
 let
-  controllerValues = ../../arc/controller/values.yaml;
-  runnerSetDir = ../../arc/runner-set;
+  controllerValues = ../arc/controller/values.yaml;
+  runnerSetDir = ../arc/runner-set;
 in {
   environment.systemPackages = with pkgs; [
 
