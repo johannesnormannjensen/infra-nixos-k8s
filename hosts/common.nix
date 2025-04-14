@@ -45,4 +45,8 @@
 
   # Set default kubeconfig
   environment.variables.KUBECONFIG = "/etc/rancher/k3s/k3s.yaml";
+
+  # Enable systemd-boot
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
 }
