@@ -80,12 +80,12 @@ To securely configure GitHub App credentials and registry access for ARC runners
 2. Edit the `.env` file and fill in the required values:
    - `GITHUB_APP_ID`
    - `GITHUB_APP_INSTALLATION_ID`
-   - `GITHUB_APP_PRIVATE_KEY_PATH`
+   - `GITHUB_APP_PRIVATE_KEY_PATH` <-- Path to the private key file (gh-app-private-key.pem)
    - `DOCKER_REGISTRY_SERVER`
    - `DOCKER_REGISTRY_USER`
    - `DOCKER_REGISTRY_PASSWORD`
 
-if you want to use ghcr.io then the `DOCKER_REGISTRY_SERVER` should be `ghcr.io` and the `DOCKER_REGISTRY_USER` & `DOCKER_REGISTRY_PASSWORD` should be the GitHub username and it's personal access token with `read:packages` scope.
+If you want to use ghcr.io then the `DOCKER_REGISTRY_SERVER` should be `ghcr.io` and the `DOCKER_REGISTRY_USER` & `DOCKER_REGISTRY_PASSWORD` should be the GitHub username and it's personal access token with `read:packages` scope.
 
 3. Load the variables into your shell session:
    ```bash

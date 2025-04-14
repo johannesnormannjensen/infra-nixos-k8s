@@ -1,7 +1,7 @@
 { pkgs, ... }:
 
 let
-  namespace = "arc-systems-runners";
+  NAMESPACE = "arc-systems-runners";
 
   secretCreate = pkgs.writeShellScriptBin "arc-secrets-create" ''
     set -euo pipefail
