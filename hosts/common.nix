@@ -21,8 +21,10 @@
   };
 
   security.sudo.wheelNeedsPassword = false;
+
   services.openssh.enable = true;
   programs.zsh.enable = true;
+
   virtualisation.docker.enable = true;
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -30,4 +32,7 @@
   environment.systemPackages = with pkgs; [
     git curl wget htop tmux vim zsh docker
   ];
+
+  # Automatically use k3s kubeconfig when running kubectl
+  environment.variables.KUBECONFIG = "/etc/rancher/k3s/k3s.yaml";
 }
