@@ -34,9 +34,11 @@ sudo cat /var/lib/rancher/k3s/server/node-token
 Export required environment variables and run:
 
 ```bash
-export HOSTNAME=worker1
+export HOSTNAME=worker-general-1
 export K3S_SERVER=https://<master-ip>:6443
-export K3S_TOKEN=<token-from-master>
+export K3S_TOKEN=<your-token>
+export K3S_NODE_LABELS="purpose=general"
+export K3S_NODE_TAINTS=""
 
 sudo nixos-rebuild switch --flake .#worker --impure
 ```
@@ -49,6 +51,14 @@ export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 kubectl get nodes
 ```
 You should see all joined nodes listed.
+
+⚙️ Automatic kubeconfig for kubectl
+To avoid having to set the KUBECONFIG variable manually, the following is included in common.nix:
+```nix
+ environment.variables.KUBECONFIG = "/etc/rancher/k3s/k3s.yaml";
+```
+This makes the kubeconfig available automatically for the kubectl command after login.
+It is especially useful on the master node.
 
 🧠 Notes
  - The --impure flag is required since we refer to files outside the flake (e.g., hardware config).
