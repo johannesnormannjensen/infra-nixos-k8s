@@ -1,6 +1,24 @@
 { config, pkgs, ... }:
 
-{
+let
+  # Statisk Helm uden GUI-afhængigheder
+  helm = pkgs.stdenv.mkDerivation {
+    pname = "helm";
+    version = "3.14.0";
+
+    src = pkgs.fetchurl {
+      url = "https://get.helm.sh/helm-v3.14.0-linux-amd64.tar.gz";
+      sha256 = "sha256-jOiVlfVnZTWGmiFmqv4dnKKCE1S1DiDbFtXBNSW3A58=";
+    };
+
+    unpackPhase = "tar -xzf $src";
+    installPhase = ''
+      mkdir -p $out/bin
+      cp linux-amd64/helm $out/bin/helm
+      chmod +x $out/bin/helm
+    '';
+  };
+in {
   networking.useDHCP = true;
   networking.firewall.enable = false;
 
@@ -18,7 +36,6 @@
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOQdssF2Mz9XboO8WdJOt5eBIqJDngCFeM9UoxhxOzoX nixos-k8s-cluster"
     ];
     shell = pkgs.zsh;
-    # Automatically create a basic .zshrc
     home = "/home/johannes";
   };
 
@@ -47,7 +64,6 @@
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  # Environment packages
   environment.systemPackages = with pkgs; [
     git
     curl
@@ -57,14 +73,16 @@
     vim
     zsh
     docker
-    helm
     kubectl
+    ${helm} # Brug statisk Helm uden X11
   ];
 
-  # Set default kubeconfig
   environment.variables.KUBECONFIG = "/etc/rancher/k3s/k3s.yaml";
 
-  # Enable systemd-boot
+  # Fjern GUI helt
+  services.xserver.enable = false;
+
+  # Boot loader
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 }
