@@ -6,10 +6,7 @@
     enable = true;
     role = "server";
     clusterInit = true;
-
-    serverConfig = {
-      write-kubeconfig-mode = "644";
-    };
+    extraFlags = "--write-kubeconfig-mode=644";
   };
 
   environment.systemPackages = with pkgs; [
