@@ -36,13 +36,13 @@ let
     CR_PAT=$(gh auth token)
     GITHUB_APP_PRIVATE_KEY=$(cat "$GITHUB_APP_PRIVATE_KEY_PATH")
 
-    echo "🔐 Creating namespace '$NAMESPACE' if needed..."
-    kubectl get ns "$NAMESPACE" >/dev/null 2>&1 || kubectl create namespace "$NAMESPACE"
+    echo "🔐 Creating namespace '${NAMESPACE}' if needed..."
+    kubectl get ns "${NAMESPACE}" >/dev/null 2>&1 || kubectl create namespace "${NAMESPACE}"
 
     if [ -n "''${DOCKER_REGISTRY_SERVER:-}" ] && [ -n "''${DOCKER_REGISTRY_USER:-}" ] && [ -n "''${DOCKER_REGISTRY_PASSWORD:-}" ]; then
       echo "🔐 Creating runner docker-registry secret..."
       kubectl create secret docker-registry runnersecret \
-        --namespace "$NAMESPACE" \
+        --namespace "${NAMESPACE}" \
         --docker-server="$DOCKER_REGISTRY_SERVER" \
         --docker-username="$DOCKER_REGISTRY_USER" \
         --docker-password="$DOCKER_REGISTRY_PASSWORD" \
@@ -53,7 +53,7 @@ let
 
     echo "🔐 Creating pre-defined GitHub App secret..."
     kubectl create secret generic pre-defined-secret \
-      --namespace "$NAMESPACE" \
+      --namespace "${NAMESPACE}" \
       --from-literal=github_app_id="$GITHUB_APP_ID" \
       --from-literal=github_app_installation_id="$GITHUB_APP_INSTALLATION_ID" \
       --from-literal=github_app_private_key="$GITHUB_APP_PRIVATE_KEY" \
@@ -71,7 +71,7 @@ let
     fi
 
     if [ "$FORCE" != "true" ]; then
-      echo "⚠️ This will delete the following secrets in namespace '$NAMESPACE':"
+      echo "⚠️ This will delete the following secrets in namespace '${NAMESPACE}':"
       echo " - runnersecret (if it exists)"
       echo " - pre-defined-secret"
       echo ""
@@ -82,9 +82,9 @@ let
       fi
     fi
 
-    echo "🧨 Deleting secrets from namespace '$NAMESPACE'..."
-    kubectl delete secret runnersecret --namespace "$NAMESPACE" || true
-    kubectl delete secret pre-defined-secret --namespace "$NAMESPACE" || true
+    echo "🧨 Deleting secrets from namespace '${NAMESPACE}'..."
+    kubectl delete secret runnersecret --namespace "${NAMESPACE}" || true
+    kubectl delete secret pre-defined-secret --namespace "${NAMESPACE}" || true
     echo "✅ Secrets deleted."
   '';
 in {
