@@ -5,7 +5,6 @@ with lib;
 let
   cfg = config.ingressController;
 
-  # define the script to set up the ingress controller
   setupIngressControllerScript = pkgs.writeShellScriptBin "setup-ingress-controller" ''
     set -euo pipefail
 
@@ -76,13 +75,12 @@ in
       };
     };
 
-    systemd.services.setup-ingress-controller-timer-service = lib.mkIf cfg.autoSetup {
-      description = "Run ingress controller setup after boot";
-      after = [ "network.target" ];
-      wants = [ "k3s.service" ];
-      serviceConfig = {
-        Type = "oneshot";
-        ExecStart = "${setupIngressControllerScript}/bin/setup-ingress-controller";
+    systemd.timers.setup-ingress-controller-timer = lib.mkIf cfg.autoSetup {
+      description = "Timer to run ingress controller setup after boot";
+      wantedBy = [ "timers.target" ];
+      timerConfig = {
+        OnBootSec = "2min";
+        Unit = "setup-ingress-controller-timer-service.service";
       };
     };
   };
