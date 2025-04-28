@@ -24,10 +24,10 @@
     ];
   };
 
-  ingressController{
+  ingressController = {
     enable = true;
     autoSetup = true;
-  }
+  };
 
   githubMonitoring = {
     enable = true;
