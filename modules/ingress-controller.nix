@@ -30,8 +30,8 @@ in
     systemd.services.setup-ingress-controller = {
       description = "Setup nginx ingress controller after k3s is ready";
       after = [ "k3s.service" ];
-      requires = [ "k3s.service" ];
-      wantedBy = [ "multi-user.target" ];
+      partOf = [ "k3s.service" ];
+      wantedBy = [ "k3s.service" ];
       serviceConfig = {
         Type = "oneshot";
         ExecStart = pkgs.writeShellScript "setup-ingress-controller" ''
