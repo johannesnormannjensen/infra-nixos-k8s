@@ -12,6 +12,17 @@ in
       default = false;
       description = "Enable GitHub monitoring stack helper script.";
     };
+    prometheusStoragePath = mkOption {
+      type = types.path;
+      default = "/var/lib/prometheus-data";
+      description = "HostPath for Prometheus data persistence.";
+    };
+    grafanaStoragePath = mkOption {
+      type = types.path;
+      default = "/var/lib/grafana-data";
+      description = "HostPath for Grafana data persistence.";
+    };
+    
   };
 
   config = mkIf cfg.enable {
@@ -78,12 +89,12 @@ in
           --set prometheus.prometheusSpec.storageSpec.volumeMounts[0].name=prometheus-storage \
           --set prometheus.prometheusSpec.storageSpec.volumeMounts[0].mountPath=/prometheus \
           --set prometheus.prometheusSpec.storageSpec.volumes[0].name=prometheus-storage \
-          --set prometheus.prometheusSpec.storageSpec.volumes[0].hostPath.path=/var/lib/prometheus-data \
+          --set prometheus.prometheusSpec.storageSpec.volumes[0].hostPath.path=${cfg.prometheusStoragePath} \
           --set prometheus.prometheusSpec.storageSpec.volumes[0].hostPath.type=DirectoryOrCreate \
           --set grafana.extraVolumeMounts[0].name=grafana-storage \
           --set grafana.extraVolumeMounts[0].mountPath=/var/lib/grafana \
           --set grafana.extraVolumes[0].name=grafana-storage \
-          --set grafana.extraVolumes[0].hostPath.path=/var/lib/grafana-data \
+          --set grafana.extraVolumes[0].hostPath.path=${cfg.grafanaStoragePath} \
           --set grafana.extraVolumes[0].hostPath.type=DirectoryOrCreate \
           --set grafana.adminPassword=admin
 
@@ -97,6 +108,20 @@ in
 
         echo "[+] Setting up Grafana Ingress"
         kubectl apply -f ${toString ./ingress-grafana.yaml}
+
+        echo "[+] Done!"
+      '')
+      (pkgs.writeShellScriptBin "teardown-github-monitoring" ''
+        set -euo pipefail
+
+        echo "[+] Deleting GitHub Exporter release"
+        helm uninstall github-exporter -n monitoring || true
+
+        echo "[+] Deleting Prometheus Stack release"
+        helm uninstall prometheus-stack -n monitoring || true
+
+        echo "[+] Deleting monitoring namespace"
+        kubectl delete namespace monitoring || true
 
         echo "[+] Done!"
       '')
