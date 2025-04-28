@@ -27,7 +27,7 @@ let
 
     ${pkgs.kubectl}/bin/kubectl create namespace ingress-nginx --dry-run=client -o yaml | ${pkgs.kubectl}/bin/kubectl apply -f -
 
-    ${pkgs.kubernetes-helm}/bin/helm repo add ingress-nginx https://kubernetes.github.io/helm-charts
+    ${pkgs.kubernetes-helm}/bin/helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
     ${pkgs.kubernetes-helm}/bin/helm repo update
 
     ${pkgs.kubernetes-helm}/bin/helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
