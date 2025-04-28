@@ -32,7 +32,7 @@ in
 
       echo "[+] Waiting for Kubernetes API to become ready..."
       for i in {1..60}; do
-        if ${pkgs.kubectl}/bin/kubectl version --short; then
+        if ${pkgs.kubectl}/bin/kubectl get nodes &> /dev/null; then
           echo "[+] Kubernetes API is ready!"
           break
         fi
