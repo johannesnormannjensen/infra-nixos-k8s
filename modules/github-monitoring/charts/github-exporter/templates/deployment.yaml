@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: github-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: github-exporter
+  template:
+    metadata:
+      labels:
+        app: github-exporter
+    spec:
+      containers:
+        - name: github-exporter
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          ports:
+            - containerPort: {{ .Values.service.port }}
+          env:
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: github-exporter-secret
+                  key: GITHUB_TOKEN
+            - name: GITHUB_ORG
+              value: {{ .Values.github.org | quote }}
+            - name: PORT
+              value: "{{ .Values.service.port }}"

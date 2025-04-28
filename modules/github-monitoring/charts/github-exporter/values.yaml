@@ -1,0 +1,10 @@
+image:
+  repository: my-registry.local:5000/github-exporter
+  tag: latest
+
+github:
+  token: ""
+  org: ""
+
+service:
+  port: 3000

@@ -1,0 +1,4 @@
+apiVersion: v2
+name: github-exporter
+description: A simple GitHub metrics exporter
+version: 0.1.0
