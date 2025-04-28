@@ -27,7 +27,7 @@ in
       helm
     ];
 
-    system.activationScripts.ingressController = ''
+    system.activationScripts.ingressController.text = ''
       echo "[+] Installing nginx ingress controller"
 
       ${pkgs.kubectl}/bin/kubectl create namespace ingress-nginx --dry-run=client -o yaml | ${pkgs.kubectl}/bin/kubectl apply -f -
