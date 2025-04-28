@@ -10,7 +10,7 @@
     ../modules/arc-tools.nix
     ../modules/arc-secrets.nix
     # Monitoring
-    ../modules/github-monitoring.nix
+    ../modules/github-monitoring/github-monitoring.nix
   ];
 
   networking.hostName = "k8s-master";
