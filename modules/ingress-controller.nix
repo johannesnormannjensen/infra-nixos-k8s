@@ -68,11 +68,12 @@ in
       wants = [ "k3s.service" ];
       serviceConfig = {
         Type = "oneshot";
-        ExecStart = "${pkgs.writeShellScript "run-setup-ingress-controller" ''
-          ${pkgs.setup-ingress-controller}/bin/setup-ingress-controller
-        ''}";
+        ExecStart = pkgs.writeShellScript "run-setup-ingress-controller" ''
+          setup-ingress-controller
+        '';
       };
     };
+
 
     systemd.timers.setup-ingress-controller-timer = lib.mkIf cfg.autoSetup {
       description = "Timer to run ingress controller setup after boot";
