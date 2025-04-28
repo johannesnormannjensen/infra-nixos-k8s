@@ -28,9 +28,6 @@
 
   githubMonitoring = {
     enable = true;
-    githubToken = "ghp_abc123...";
-    githubOrg = "din-org";
-    exporterImage = "my-registry.local:5000/github-exporter:latest";
     prometheusStoragePath = "/var/lib/prometheus-data";
     grafanaStoragePath = "/var/lib/grafana-data";
   };
