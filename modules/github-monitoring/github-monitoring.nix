@@ -37,7 +37,7 @@ in
 
     environment.systemPackages = with pkgs; [
       kubectl
-      helm
+      kubernetes-helm
       (pkgs.writeShellScriptBin "setup-github-monitoring" ''
         set -euo pipefail
 

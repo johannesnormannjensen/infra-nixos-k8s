@@ -27,10 +27,10 @@ let
 
     ${pkgs.kubectl}/bin/kubectl create namespace ingress-nginx --dry-run=client -o yaml | ${pkgs.kubectl}/bin/kubectl apply -f -
 
-    ${pkgs.helm}/bin/helm repo add ingress-nginx https://kubernetes.github.io/helm-charts
-    ${pkgs.helm}/bin/helm repo update
+    ${pkgs.kubernetes-helm}/bin/helm repo add ingress-nginx https://kubernetes.github.io/helm-charts
+    ${pkgs.kubernetes-helm}/bin/helm repo update
 
-    ${pkgs.helm}/bin/helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
+    ${pkgs.kubernetes-helm}/bin/helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
       --namespace ingress-nginx
 
     echo "[+] Done setting up ingress!"
@@ -61,7 +61,7 @@ in
 
     environment.systemPackages = with pkgs; [
       kubectl
-      helm
+      kubernetes-helm
       setupIngressControllerScript
     ];
 
