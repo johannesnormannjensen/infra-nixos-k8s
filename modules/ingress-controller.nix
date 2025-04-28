@@ -27,30 +27,41 @@ in
       helm
     ];
 
-    system.activationScripts.ingressController.text = ''
-      set -euo pipefail
+    systemd.services.setup-ingress-controller = {
+      description = "Setup nginx ingress controller after k3s is ready";
+      after = [ "k3s.service" ];
+      requires = [ "k3s.service" ];
+      wantedBy = [ "multi-user.target" ];
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = pkgs.writeShellScript "setup-ingress-controller" ''
+          set -euo pipefail
 
-      echo "[+] Waiting for Kubernetes API to become ready..."
-      for i in {1..60}; do
-        if ${pkgs.kubectl}/bin/kubectl get nodes &> /dev/null; then
-          echo "[+] Kubernetes API is ready!"
-          break
-        fi
-        echo "Waiting for k3s API... ($i)"
-        sleep 2
-      done
+          echo "[+] Waiting for Kubernetes API to become ready..."
+          for i in {1..60}; do
+            if ${pkgs.kubectl}/bin/kubectl get nodes &> /dev/null; then
+              echo "[+] Kubernetes API is ready!"
+              break
+            fi
+            echo "Waiting for k3s API... ($i)"
+            sleep 2
+          done
 
-      echo "[+] Installing nginx ingress controller"
+          echo "[+] Installing nginx ingress controller"
 
-      ${pkgs.kubectl}/bin/kubectl create namespace ingress-nginx --dry-run=client -o yaml | ${pkgs.kubectl}/bin/kubectl apply -f -
+          ${pkgs.kubectl}/bin/kubectl create namespace ingress-nginx --dry-run=client -o yaml | ${pkgs.kubectl}/bin/kubectl apply -f -
 
-      ${pkgs.helm}/bin/helm repo add ingress-nginx https://kubernetes.github.io/helm-charts
-      ${pkgs.helm}/bin/helm repo update
+          ${pkgs.helm}/bin/helm repo add ingress-nginx https://kubernetes.github.io/helm-charts
+          ${pkgs.helm}/bin/helm repo update
 
-      ${pkgs.helm}/bin/helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
-        --namespace ingress-nginx
+          ${pkgs.helm}/bin/helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
+            --namespace ingress-nginx
 
-      echo "[+] Done setting up ingress!"
-    '';
+          echo "[+] Done setting up ingress!"
+        '';
+        Restart = "on-failure";
+        RestartSec = "10s";
+      };
+    };
   };
 }
