@@ -76,12 +76,13 @@ in
       };
     };
 
-    systemd.timers.setup-ingress-controller-timer = lib.mkIf cfg.autoSetup {
-      description = "Timer to run ingress controller setup after boot";
-      wantedBy = [ "timers.target" ];
-      timerConfig = {
-        OnBootSec = "2min";
-        Unit = "setup-ingress-controller-timer-service.service";
+    systemd.services.setup-ingress-controller-timer-service = lib.mkIf cfg.autoSetup {
+      description = "Run ingress controller setup after boot";
+      after = [ "network.target" ];
+      wants = [ "k3s.service" ];
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = "${setupIngressControllerScript}/bin/setup-ingress-controller";
       };
     };
   };
