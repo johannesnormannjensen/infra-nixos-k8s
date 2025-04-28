@@ -29,11 +29,12 @@ in
 
     systemd.services.setup-ingress-controller = {
       description = "Setup nginx ingress controller after k3s is ready";
-      after = [ "k3s.service" ];
-      partOf = [ "k3s.service" ];
-      wantedBy = [ "k3s.service" ];
+      after = [ "k3s.service" "network.target" ];
+      wants = [ "k3s.service" ];
+      wantedBy = [ "multi-user.target" ];
       serviceConfig = {
         Type = "oneshot";
+        RemainAfterExit = true;
         ExecStart = pkgs.writeShellScript "setup-ingress-controller" ''
           set -euo pipefail
 
