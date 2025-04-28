@@ -19,7 +19,7 @@
     enable = true;
     role = "server";
     clusterInit = true;
-    services.k3s.extraFlags = lib.mkAfter [
+    extraFlags = lib.mkAfter [
       "--write-kubeconfig-mode=644"
     ];
   };
