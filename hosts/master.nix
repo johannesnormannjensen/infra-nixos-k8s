@@ -19,7 +19,9 @@
     enable = true;
     role = "server";
     clusterInit = true;
-    extraFlags = "--write-kubeconfig-mode=644";
+    services.k3s.extraFlags = lib.mkAfter [
+      "--write-kubeconfig-mode=644"
+    ];
   };
 
   ingressController.enable = true;
