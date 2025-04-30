@@ -23,7 +23,7 @@ spec:
                 secretKeyRef:
                   name: github-exporter-secret
                   key: GITHUB_TOKEN
-            - name: GITHUB_ORG
-              value: {{ .Values.github.org | quote }}
+            - name: GITHUB_REPO
+              value: {{ .Values.github.repo | quote }}
             - name: PORT
               value: "{{ .Values.service.port }}"

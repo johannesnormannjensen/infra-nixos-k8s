@@ -3,7 +3,7 @@
 let
   NAMESPACE = "arc-systems-runners";
 
-  secretCreate = pkgs.writeShellScriptBin "arc-secrets-create" ''
+  secretCreate = pkgs.writeShellScriptBin "create-arc-secrets" ''
     set -euo pipefail
 
     # Load environment
@@ -62,7 +62,7 @@ let
     echo "✅ ARC secrets created successfully."
   '';
 
-  secretDelete = pkgs.writeShellScriptBin "arc-secrets-delete" ''
+  secretDelete = pkgs.writeShellScriptBin "delete-arc-secrets" ''
     set -euo pipefail
 
     FORCE="false"

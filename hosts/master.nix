@@ -11,6 +11,8 @@
     ../modules/arc-secrets.nix
     # Monitoring
     ../modules/github-monitoring/github-monitoring.nix
+    # Cert-manager
+    ../modules/cert-manager.nix
   ];
 
   networking.hostName = "k8s-master";
@@ -24,6 +26,14 @@
     ];
   };
 
+  # Deklarativ registries.yaml til container registry access
+  environment.etc."rancher/k3s/registries.yaml".text = ''
+    mirrors:
+      "yourprivate.repo:32000":
+        endpoint:
+          - "http://yourprivate.repo:32000"
+  '';
+
   ingressController = {
     enable = true;
     autoSetup = true;
@@ -34,6 +44,8 @@
     prometheusStoragePath = "/var/lib/prometheus-data";
     grafanaStoragePath = "/var/lib/grafana-data";
   };
+
+  certManager.enable = true;
 
   environment.etc."secrets".source = "/etc/secrets";
 

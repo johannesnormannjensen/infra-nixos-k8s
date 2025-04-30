@@ -7,7 +7,7 @@ in {
   environment.systemPackages = with pkgs; [
 
     # ARC controller install
-    (pkgs.writeShellScriptBin "arc-deploy" ''
+    (pkgs.writeShellScriptBin "deploy-arc-controller" ''
       helm upgrade --install arc \
         oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller \
         --namespace arc-systems \
@@ -17,12 +17,12 @@ in {
     '')
 
     # ARC controller uninstall
-    (pkgs.writeShellScriptBin "arc-uninstall" ''
+    (pkgs.writeShellScriptBin "uninstall-arc-controller" ''
       helm uninstall arc --namespace arc-systems || true
     '')
 
     # Runner sets install
-    (pkgs.writeShellScriptBin "arc-runners-deploy" ''
+    (pkgs.writeShellScriptBin "deploy-arc-runners" ''
       for file in ${toString runnerSetDir}/*.yaml; do
         name=$(basename "$file" .yaml)
         echo "Deploying runner set: $name"
@@ -36,12 +36,12 @@ in {
     '')
 
     # Runner sets upgrade
-    (pkgs.writeShellScriptBin "arc-runners-upgrade" ''
-      arc-runners-deploy
+    (pkgs.writeShellScriptBin "upgrade-arc-runners" ''
+      deploy-arc-runners
     '')
 
     # Runner sets uninstall
-    (pkgs.writeShellScriptBin "arc-runners-uninstall" ''
+    (pkgs.writeShellScriptBin "uninstall-arc-runners" ''
       for file in ${toString runnerSetDir}/*.yaml; do
         name=$(basename "$file" .yaml)
         echo "Uninstalling runner set: $name"
@@ -50,12 +50,12 @@ in {
     '')
 
     # Status checker
-    (pkgs.writeShellScriptBin "arc-status" ''
+    (pkgs.writeShellScriptBin "status-arc-runners" ''
       kubectl get pods -n arc-systems-runners
     '')
 
     # Status checker watch
-    (pkgs.writeShellScriptBin "arc-status-watch" ''
+    (pkgs.writeShellScriptBin "status-arc-runners-watch" ''
       watch -n 2 kubectl get pods -n "arc-systems-runners"
     '')
   ];

@@ -51,4 +51,9 @@
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+
+  # Allow Docker to pull from insecure local registry
+  virtualisation.docker.daemon.settings = {
+    "insecure-registries" = [ "polaris-02.nestech.dk:32000" ];
+  };
 }

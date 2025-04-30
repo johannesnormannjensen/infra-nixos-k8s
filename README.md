@@ -131,6 +131,23 @@ arc-uninstall          # Uninstalls ARC controller
 arc-status             # Shows ARC pods
 ```
 
+## Cert manager
+1. 💠 Create an Azure Service Principal
+You need to create an Azure App Registration with DNS permissions.
+
+Go to Azure → App registrations → New app
+
+Give it the DNS Contributor role on your DNS zone
+
+You need to note:
+
+- tenantId
+- clientId
+- clientSecret
+- subscriptionId
+- resourceGroup
+- zoneName (e.g. something.dk)
+
 ## 📜 Available Commands
 
 | Command               | Description                                       |
